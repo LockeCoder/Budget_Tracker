@@ -1,123 +1,130 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include <map>
-#include <string>
-#include <fstream> // for file operations
-#include <limits>
+#include <sstream>
+#include <ctime>
 
 using namespace std;
 
-class GroceryManager {
+struct Transaction {
+    string description;
+    double amount;
+    string category;
+    string date;
+};
+
+class BudgetTracker {
 private:
-    map<string, int> itemFrequency;
+    map<string, double> categories;
+    vector<Transaction> transactions;
 
 public:
-    // Constructor to initialize data
-    GroceryManager() {
-        initializeData();
+    void addTransaction(const Transaction& transaction) {
+        transactions.push_back(transaction);
+        categories[transaction.category] += transaction.amount;
     }
 
-    // Function to initialize item frequencies
-    void initializeData() {
-        // Data containing items
-        string data = "Spinach Radishes Broccoli Peas Cranberries Cranberries Potatoes Cucumbers Radishes Cranberries Peaches Zucchini Potatoes Cranberries Cantaloupe Beets Cauliflower Cranberries Peas Zucchini Peas Onions Potatoes Cauliflower Spinach Radishes Onions Zucchini Cranberries Peaches Yams Zucchini Apples Apples Cucumbers Broccoli Cranberries Beets Peas Cauliflower Potatoes Cauliflower Celery Limes Cranberries Broccoli Spinach Broccoli Garlic Cauliflower Pumpkins Celery Peas Potatoes Yams Zucchini Cranberries Cantaloupe Zucchini Pumpkins Cauliflower Yams Pears Peaches Apples Zucchini Cranberries Zucchini Garlic Broccoli Garlic Onions Spinach Cucumbers Cucumbers Garlic Spinach Peaches Cucumbers Broccoli Zucchini Peas Celery Cucumbers Celery Yams Garlic Cucumbers Peas Beets Yams Peas Apples Peaches Garlic Celery Garlic Cucumbers Garlic Apples Celery Zucchini Cucumbers Onions";
-        string item;
-        size_t pos = 0;
-        // Parsing the data string to extract items and count frequencies
-        while ((pos = data.find(" ")) != string::npos) {
-            item = data.substr(0, pos);
-            itemFrequency[item]++;
-            data.erase(0, pos + 1);
+    void loadTransactionsFromFile(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error opening file: " << filename << endl;
+            return;
         }
-        // Handle the last item after the loop
-        if (!data.empty()) {
-            itemFrequency[data]++;
-        }
-    }
 
-    // Function to write item frequencies to a file
-    void writeFrequencyToFile(const string& filename) {
-        ofstream outFile(filename);
-        if (outFile.is_open()) {
-            for (const auto& pair : itemFrequency) {
-                outFile << pair.first << " " << pair.second << endl;
-                cout << "adding " << pair.first << " " << pair.second << endl;
+        string line;
+        while (getline(file, line)) {
+            istringstream iss(line);
+            string description, category;
+            double amount;
+            char delimiter;
+
+            if (!(iss >> description >> delimiter >> amount >> delimiter >> category)) {
+                cerr << "Error reading line: " << line << endl;
+                continue;
             }
-            outFile.close();
-            cout << "Frequency data written to " << filename << " successfully." << endl;
+
+            // Get current date and time
+            time_t now = time(0);
+            tm* localTime = localtime(&now);
+            char date[11]; // Buffer for date in the format YYYY-MM-DD
+            strftime(date, sizeof(date), "%Y-%m-%d", localTime);
+
+            addTransaction({ description, amount, category, date });
         }
-        else {
-            cout << "Unable to open file for writing." << endl;
-        }
+
+        file.close();
     }
 
-    // Function to get frequency of a specific item
-    int getItemFrequency(const string& item) {
-        return itemFrequency[item];
+    void printSummary() {
+        cout << "------ Budget Summary ------" << endl;
+        cout << "Category\t\tAmount" << endl;
+        for (const auto& pair : categories) {
+            cout << pair.first << "\t\t" << pair.second << endl;
+        }
+        cout << "----------------------------" << endl;
     }
 
-    // Function to print item frequency list
-    void printItemFrequencyList() {
-        for (const auto& pair : itemFrequency) {
-            cout << pair.first << " " << pair.second << endl;
+    void printTransactions() {
+        cout << "------ Transaction History ------" << endl;
+        for (const auto& transaction : transactions) {
+            cout << "Date: " << transaction.date << ", Description: " << transaction.description << ", Amount: " << transaction.amount << ", Category: " << transaction.category << endl;
         }
-    }
-
-    // Function to print histogram of item frequencies
-    void printHistogram() {
-        for (const auto& pair : itemFrequency) {
-            cout << pair.first << " ";
-            for (int i = 0; i < pair.second; ++i) {
-                cout << "*";
-            }
-            cout << endl;
-        }
+        cout << "--------------------------------" << endl;
     }
 };
 
 int main() {
-    // Create a GroceryManager object
-    GroceryManager manager;
+    BudgetTracker budgetTracker;
+    budgetTracker.loadTransactionsFromFile("budget_data.dat");
 
-    // Write item frequencies to a file
-    manager.writeFrequencyToFile("frequency.dat");
-
-    int choice = 0;
-    // Main menu loop
-    while (choice != 4) {
-        cout << "\nMenu:\n";
-        cout << "1. Search for item frequency\n";
-        cout << "2. Print item frequency list\n";
-        cout << "3. Print histogram\n";
-        cout << "4. Exit\n";
+    int choice;
+    do {
+        cout << "Menu:" << endl;
+        cout << "1- Add transaction" << endl;
+        cout << "2- Display transaction history" << endl;
+        cout << "3- Print summary" << endl;
+        cout << "4- Quit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        // Switch based on user choice
         switch (choice) {
         case 1: {
-            string item;
-            cout << "Enter item to search: ";
-            cin >> item;
-            cout << "Frequency: " << manager.getItemFrequency(item) << endl;
+            Transaction transaction;
+            cout << "Enter transaction description: ";
+            cin.ignore();
+            getline(cin, transaction.description);
+            cout << "Enter transaction amount: ";
+            cin >> transaction.amount;
+            cout << "Enter transaction category: ";
+            cin.ignore();
+            getline(cin, transaction.category);
+
+            // Get current date and time
+            time_t now = time(0);
+            tm* localTime = localtime(&now);
+            char date[11]; // Buffer for date in the format YYYY-MM-DD
+            strftime(date, sizeof(date), "%Y-%m-%d", localTime);
+
+            transaction.date = date;
+
+            budgetTracker.addTransaction(transaction);
+            cout << "Transaction added successfully." << endl;
             break;
         }
         case 2:
-            manager.printItemFrequencyList();
+            budgetTracker.printTransactions();
             break;
         case 3:
-            manager.printHistogram();
+            budgetTracker.printSummary();
             break;
         case 4:
-            cout << "Exiting program.\n";
+            cout << "Exiting the program. Goodbye!" << endl;
             break;
         default:
-            cout << "Invalid choice. Please try again.\n";
-            break;
+            cout << "Invalid choice. Please try again." << endl;
         }
-    }
+    } while (choice != 4);
 
     return 0;
 }
