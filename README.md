@@ -6,7 +6,7 @@ C++ console-based budget tracking application that lets users load transaction d
 
 This project demonstrates basic C++ application development using a class-based design, file input, transaction storage, menu-driven user interaction, and category-based summary reporting.
 
-The program loads transaction data from a `.dat` file so budget information can persist across program sessions. Users can then add transactions, display transaction history, print summaries, or exit the program through a console menu.
+The program loads transaction data from a `.dat` file so budget information can persist across program sessions. Users can add transactions, display transaction history, print summaries, or exit the program through a console menu.
 
 ## Repository Contents
 
@@ -17,18 +17,18 @@ The program loads transaction data from a `.dat` file so budget information can 
 ## Features
 
 - Loads transaction data from a `.dat` file
-- Adds new transactions through a console menu
+- Adds new budget transactions through a console menu
 - Stores transaction description, amount, category, and date
 - Displays transaction history
-- Prints spending summary by category
+- Prints spending summaries by category
 - Uses a `BudgetTracker` class to organize transaction logic
 - Includes basic error handling for file access and invalid menu choices
 
 ## How It Works
 
 1. The program starts and attempts to load existing transactions from `budget_data.dat`.
-2. The user is shown a menu with options to add transactions, display history, print a summary, or quit.
-3. When a transaction is added, the program records the description, amount, category, and current date.
+2. The user is shown a menu with options to add transactions, display transaction history, print a summary, or quit.
+3. When a transaction is added, the program records the description, amount, category, and date.
 4. Transactions are stored in memory while the program runs.
 5. Category totals are tracked and displayed in the budget summary.
 
@@ -108,7 +108,7 @@ To address this, I approached the problem in smaller steps: opening the file, re
 
 ### Version Control
 
-In this project, I used GitHub and version control concepts to manage project files and track changes. Version control supports collaboration, code sharing, project history, and safer software development practices.
+In this project, I used GitHub and version control concepts to manage project files and track changes. Version control supports code sharing, project history, and safer software development practices.
 
 These skills are transferable to future individual projects, open-source contributions, and team-based development environments.
 
@@ -118,10 +118,16 @@ I prioritized maintainability, readability, and adaptability by using a class-ba
 
 The code also uses meaningful variable names, comments, and error-handling logic to make the application easier to review and modify. This structure supports future improvements such as saving transactions, editing transactions, deleting transactions, and generating more detailed reports.
 
+## Project Value
+
+This project shows the ability to build a small C++ console application that reads structured data, organizes records in memory, presents a menu-driven interface, and summarizes financial information by category.
+
+It is strongest for demonstrating C++ fundamentals, file input handling, class-based design, basic data modeling, and maintainable console application structure.
+
 ## Future Improvements
 
 - Save newly added transactions back to `budget_data.dat`
-- Improve parsing for descriptions with spaces
+- Improve parsing for descriptions with commas or unusual characters
 - Add transaction editing and deletion
 - Add monthly or date-range summaries
 - Add input validation for transaction amounts
