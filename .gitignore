@@ -1,0 +1,30 @@
+# Compiled binaries
+*.exe
+*.out
+*.app
+
+# Object and build files
+*.obj
+*.o
+*.pdb
+*.ilk
+
+# Visual Studio files
+*.user
+*.suo
+*.VC.db
+.vs/
+Debug/
+Release/
+x64/
+Win32/
+
+# CMake/build folders if added later
+build/
+cmake-build-debug/
+cmake-build-release/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
